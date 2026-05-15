@@ -1,4 +1,6 @@
 import sys
+import math
+import json
 from operator import itemgetter 
 import numpy as np
 
@@ -53,17 +55,25 @@ class KNN:
             )
         distances.sort(key=itemgetter(1))
         return distances[:k]
-    
-user_preferences = dict([
-    ("Priyanka", [3, 4, 4, 1, 4]),
-    ("Justine", [4, 3, 5, 1, 5]),
-    ("Morpheus", [2, 5, 1, 3, 1]),
-    ("Alina", [2, 3, 1, 5, 3])
-])
 
-knn = KNN(user_preferences)
+def main():
+    username = sys.argv[1]
+    if username is None:
+        print('Username must be passed..')
+        return
 
-username, k = sys.argv[1:]
+    data = dict()
+    with open('data.json', 'r') as file:
+        data = json.load(file)
 
-if username is not None and k is not None:
-    print(f'Closest {k} neightbors of the user {username} are:', knn.find_k_closest_neighbours(int(k), username))
+    if username not in data.keys():
+        print(f'Given username {username} is outside of the list {data.keys()}')
+        return
+
+    knn = KNN(data)
+    k = int(round(math.sqrt(len(data))))
+
+    print(f'Closest {k} neightbors of the user {username} are:', knn.find_k_closest_neighbours(k, username))
+
+
+main()
